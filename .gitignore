@@ -1,0 +1,4 @@
+test/*.db
+dist/
+node_modules/
+pnpm-lock.yaml

@@ -1,0 +1,19 @@
+@engine sqlite3 {
+    file: "test.db"
+}
+
+model Users {
+    id Int Primary AutoIncrement
+    name String
+    userIsGay String
+
+
+    age Int Default 0
+}
+/*
+model Posts {
+    id Int Primary AutoIncrement
+
+    title String
+    body String
+}*/
