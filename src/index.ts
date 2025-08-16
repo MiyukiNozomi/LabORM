@@ -1,11 +1,13 @@
-import { exists, existsSync, readFileSync, statSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, statSync } from "fs";
 import { SchemaParser } from "./lab/parser";
 import { initializeSchemaFile } from "./lab/schema";
 import { performMigrations } from "./lab/migrations";
+import { installAndGenerateClient } from "./lab/generation";
 
 export let RunOptions = {
   VERBOSE: false,
   FORCE_MIGRATION: false,
+  FORCE_DRIVER_INSTALL: false,
   SCHEMA_FILE: "myschema.laborm",
   OUTPUT_DIR: "laborm",
 };
@@ -53,6 +55,16 @@ async function performMigrate() {
   console.log("Successfully applied migrations!");
 }
 
+async function performGenerate() {
+  const engine = getEngineOrUndefined();
+  if (!engine) return (process.exitCode = -1);
+
+  if ((await installAndGenerateClient(engine)) != 0) {
+    console.error("Generate failed.");
+    return (process.exitCode = -2);
+  }
+}
+
 async function main() {
   let args = process.argv.slice(2);
 
@@ -62,6 +74,7 @@ async function main() {
 
     if (arg == "--verbose") RunOptions.VERBOSE = true;
     else if (arg == "--force-migrate") RunOptions.FORCE_MIGRATION = true;
+    else if (arg == "--force-install") RunOptions.FORCE_DRIVER_INSTALL = true;
     else if (arg == "--schema") {
       const name = args[++i];
       if (!name) {
@@ -94,12 +107,18 @@ LabORM - A experimental ORM generator
 
 Commands:
     laborm migrate    -    performs a migration
+    laborm generate   -    generates your client, does not apply migrations
 `);
   }
+
+  mkdirSync(RunOptions.OUTPUT_DIR, { recursive: true });
 
   switch (command) {
     case "migrate": {
       return await performMigrate();
+    }
+    case "generate": {
+      return await performGenerate();
     }
     default:
       process.exitCode = -1;

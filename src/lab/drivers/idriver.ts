@@ -5,6 +5,26 @@ export type DriverOptionsOrErrors<T> = {
   driverOptions?: T;
 };
 
+export type QueryOperator =
+  | "EQUALS"
+  | "NOT_EQUALS"
+  | "GREATER"
+  | "LESS"
+  | "GREATER_EQUAL"
+  | "LESS_EQUAL";
+
+export type QueryOption = {
+  columnName: string;
+  op: QueryOperator;
+  value: unknown;
+};
+
+export type CompoundQueryOption = {
+  left: QueryOption | CompoundQueryOption;
+  op: "OR" | "AND";
+  right: QueryOption | CompoundQueryOption;
+};
+
 /**
  * To contributors,
  *
@@ -13,7 +33,21 @@ export type DriverOptionsOrErrors<T> = {
  * This is due to the fact *some* database bind
  */
 export interface IDriver {
+  /*** tools */
+  printSetupMessage(): Promise<void>;
+
   /*** Data management */
+  find(
+    tableName: string,
+    queryOptions: QueryOption | CompoundQueryOption | undefined
+  ): Promise<Array<any>>;
+  update(
+    tableName: string,
+    values: Record<string, any>,
+    queryOptions: QueryOption | CompoundQueryOption | undefined
+  ): Promise<Array<any>>;
+
+  insert(tableName: string, values: Record<string, any>): Promise<unknown>;
 
   /*** Schema Management */
   loadSchema(): Promise<SchemaFile | null>;

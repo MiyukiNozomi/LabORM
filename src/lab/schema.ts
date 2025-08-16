@@ -1,6 +1,6 @@
 import { RunOptions } from "..";
 import { DriverOptionsOrErrors, IDriver } from "./drivers/idriver";
-import SQLite3Driver from "./drivers/sqlite3";
+import { SQLite3Driver } from "./drivers/sqlite3/sqlite3";
 import { SchemaLexer, Token, TokenType } from "./lexer";
 import { writeErrorImpl } from "./tools";
 
@@ -39,6 +39,7 @@ export type SchemaFile = {
 
 export type NativeDatabase = {
   driver: IDriver;
+  driverOptions: unknown;
   schema: SchemaFile;
 };
 
@@ -225,6 +226,7 @@ export function initializeSchemaFile(
   }
 
   return {
+    driverOptions,
     driver: createEngine(schemaFile.engineOptions, driverOptions),
     schema: schemaFile,
   };

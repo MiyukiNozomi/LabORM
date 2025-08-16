@@ -1,12 +1,17 @@
 import Database from "better-sqlite3";
-import { DriverOptionsOrErrors, IDriver } from "./../idriver";
-import { maythraTypeToSQLite3 } from "./conv";
+import {
+  CompoundQueryOption,
+  DriverOptionsOrErrors,
+  IDriver,
+  QueryOption,
+} from "./../idriver";
+import { columnInfoAsSQLiteDeclaration, queryOptionsToWhereStmt } from "./conv";
 import { ColumnInfo, ModelInfo, SchemaFile } from "../../schema";
 import { Token } from "../../lexer";
 import path from "path";
 import { RunOptions } from "../../..";
 
-type SQLite3DriverOptions = { file: string };
+export type SQLite3DriverOptions = { file: string };
 
 export class SQLite3Driver implements IDriver {
   private db: Database.Database;
@@ -15,6 +20,92 @@ export class SQLite3Driver implements IDriver {
     this.db = new Database(payload.file);
   }
 
+  /**************************
+   *          Tools         *
+   **************************/
+  public async printSetupMessage(): Promise<void> {
+    console.log(`
+Welcome to LabORM/SQLite3!
+This driver has a runtime dependency on @better-sqlite3.
+
+Please install this module before using the LabORM generated client!
+`);
+  }
+
+  /**************************
+   *     Data Management    *
+   **************************/
+  public async find(
+    tableName: string,
+    queryOptions: QueryOption | CompoundQueryOption | undefined
+  ): Promise<Array<any>> {
+    let valuesList = new Array<unknown>();
+    const possibleQuery = queryOptionsToWhereStmt(queryOptions, valuesList);
+
+    const preparedStmt = this.db.prepare(`
+    SELECT
+      *
+    FROM ${tableName}
+    ${possibleQuery}
+    `);
+
+    preparedStmt.bind(...valuesList);
+
+    return preparedStmt.all();
+  }
+
+  public async update(
+    tableName: string,
+    values: Record<string, any>,
+    queryOptions: QueryOption | CompoundQueryOption | undefined
+  ): Promise<Array<any>> {
+    const valueKeys = Object.keys(values);
+
+    let queryValuesList = new Array<unknown>();
+    const possibleQuery = queryOptionsToWhereStmt(
+      queryOptions,
+      queryValuesList
+    );
+
+    const preparedStmt = this.db.prepare(`
+    UPDATE ${tableName}
+    SET
+      ${valueKeys.map((v) => `${v} = ?`)}
+    ${possibleQuery}
+    `);
+
+    // I could do Object.values here too.. but i would rather do it this way to ensure they will have the same values as valueKeys.
+    for (let i = 0; i < valueKeys.length; i++) {
+      preparedStmt.bind(values[valueKeys[i]!]);
+    }
+
+    preparedStmt.bind(...queryValuesList);
+
+    return preparedStmt.all();
+  }
+
+  public async insert(
+    tableName: string,
+    values: Record<string, any>
+  ): Promise<unknown> {
+    const valueKeys = Object.keys(values);
+    const preparedStmt = this.db.prepare(
+      `INSERT INTO ${tableName} (${values.join(",")})
+       VALUES (${valueKeys.map((v) => "?").join(",")})
+       RETURNING (${values.join(",")})`
+    );
+
+    // I could do Object.values here, but i would rather do it this way to ensure they will have the same values as valueKeys.
+    for (let i = 0; i < valueKeys.length; i++) {
+      preparedStmt.bind(values[valueKeys[i]!]);
+    }
+
+    return preparedStmt.all();
+  }
+
+  /**************************
+   *    Schema Management   *
+   **************************/
   public async loadSchema(): Promise<SchemaFile | null> {
     if (
       this.db
@@ -61,7 +152,7 @@ WHERE type='table' AND name='labORMKeyValue'`
     this.db.exec(`
         CREATE TABLE ${table.name.data} (
             ${table.columns
-              .map((v) => this.columnInfoAsSQLiteDeclaration(v))
+              .map((v) => columnInfoAsSQLiteDeclaration(v))
               .join(",\n")}
         ) 
     `);
@@ -71,7 +162,7 @@ WHERE type='table' AND name='labORMKeyValue'`
     this.db.exec(`
         ALTER TABLE ${
           col.ownerModelName.data
-        } ADD COLUMN ${this.columnInfoAsSQLiteDeclaration(col)}`);
+        } ADD COLUMN ${columnInfoAsSQLiteDeclaration(col)}`);
   }
 
   public async updateColumn(col: ColumnInfo) {
@@ -99,14 +190,9 @@ WHERE type='table' AND name='labORMKeyValue'`
     `);
   }
 
-  private columnInfoAsSQLiteDeclaration(column: ColumnInfo) {
-    let decl = `${column.name.data} ${maythraTypeToSQLite3(column.type)}`;
-    if (column.primaryKey) decl += " PRIMARY KEY";
-    if (!column.nullable) decl += " NOT NULL";
-    if (column.autoIncrement && !column.primaryKey) decl += " AUTOINCREMENT";
-    return decl;
-  }
-
+  /**************************
+   *          Other         *
+   **************************/
   public async close() {
     this.db.close();
   }

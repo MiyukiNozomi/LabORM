@@ -238,5 +238,7 @@ Migration will not occur unless --force-migrate is specified.`
   }
 
   await engine.driver.storeSchema(engine.schema);
+
+  await engine.driver.printSetupMessage();
   return 0;
 }

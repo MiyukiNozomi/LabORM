@@ -5,7 +5,8 @@
   "main": "./dist/index.js",
   "bin": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test-generate": "node . generate --dst-folder test/labORM --schema test/schema.laborm --verbose",
+    "test-migrate": "node . migrate --dst-folder test/labORM --schema test/schema.laborm --verbose"
   },
   "keywords": [],
   "author": "",
