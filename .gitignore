@@ -3,3 +3,4 @@ dist/
 node_modules/
 pnpm-lock.yaml
 test/labORM
+test/node_modules

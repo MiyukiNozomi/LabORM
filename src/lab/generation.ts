@@ -72,7 +72,12 @@ function columnTypeToJS(type: ColumnType) {
 function generateTypescriptTypeDeclaration(model: ModelInfo) {
   return `export type ${model.name.data} = {
     ${model.columns
-      .map((v) => `${v.name.data} : ${columnTypeToJS(v.type)};`)
+      .map(
+        (v) =>
+          `${v.name.data} ${
+            v.primaryKey || v.nullable || v.defaultValue ? "?" : ""
+          }: ${columnTypeToJS(v.type)};`
+      )
       .join("\n\t")}
 }`;
 }
@@ -82,7 +87,7 @@ function generateModelObject(model: ModelInfo) {
 
   let className = `${model.name.data}LabImpl`;
 
-  modelClass = modelClass.replace(`ModelClientImpl`, className);
+  modelClass = modelClass.replaceAll(`ModelClientImpl`, className);
 
   let columnsTyping: Record<string, string> = {};
   model.columns.forEach(
@@ -107,7 +112,9 @@ function generateAndInstallGenericClient(engine: NativeDatabase) {
 
   labORMClass = labORMClass.replace(
     "$engineDecl",
-    `(require("./driver/index.js"))(${JSON.stringify(engine.driverOptions)});`
+    `(require("./driver/index.js")).default(${JSON.stringify(
+      engine.driverOptions
+    )});`
   );
 
   let fieldList = new Array<{
@@ -130,17 +137,17 @@ function generateAndInstallGenericClient(engine: NativeDatabase) {
       columnTypeName: v.name.data,
     });
 
-    return `this.${fieldName} = new ${mdl.className}(this);`;
+    return `this.${fieldName} = new ${mdl.className}(this.engine);`;
   });
 
   labORMClass = labORMClass.replace(
     `//@lab-generate-listing-here`,
-    initList.join(";\n\t\t") + ";"
+    initList.join("\n\t\t")
   );
 
   labORMClass = labORMClass.replace(
     `/*** @lab-generate-listing-here */`,
-    fieldList.map((v) => v.name).join("\n\t")
+    fieldList.map((v) => v.name).join(";\n\t") + ";"
   );
 
   writeFileSync(path.join(RunOptions.OUTPUT_DIR, "laborm.js"), labORMClass);
@@ -160,9 +167,7 @@ function generateAndInstallGenericClient(engine: NativeDatabase) {
       )
       .join("\n");
 
-  let labORMClassTypings = readFileSync(
-    path.join(__dirname, "generic/client.d.ts")
-  ).toString();
+  let labORMClassTypings = localScriptFileLoad("generic/client.d.ts");
 
   labORMClassTypings = labORMClassTypings.replace(
     `/*** @lab-generate-listing-here */`,

@@ -85,15 +85,12 @@ Please install this module before using the LabORM generated client!
   ): Promise<unknown> {
     const valueKeys = Object.keys(values);
     const preparedStmt = this.db.prepare(
-      `INSERT INTO ${tableName} (${values.join(",")})
+      `INSERT INTO ${tableName} (${valueKeys.join(",")})
        VALUES (${valueKeys.map((v) => "?").join(",")})
-       RETURNING (${values.join(",")})`
+       RETURNING ${valueKeys.join(",")}`
     );
 
-    // I could do Object.values here, but i would rather do it this way to ensure they will have the same values as valueKeys.
-    for (let i = 0; i < valueKeys.length; i++) {
-      preparedStmt.bind(values[valueKeys[i]!]);
-    }
+    preparedStmt.bind(...valueKeys.map((v) => values[v]));
 
     return preparedStmt.all();
   }
@@ -208,7 +205,9 @@ WHERE type='table' AND name='labORMKeyValue'`
     return {
       errors: [],
       driverOptions: {
-        file: path.join(RunOptions.OUTPUT_DIR, options["file"].data),
+        file: path.resolve(
+          path.join(RunOptions.OUTPUT_DIR, options["file"].data)
+        ),
       },
     };
   }

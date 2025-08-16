@@ -7,7 +7,6 @@ model Users {
     name String
     userIsGay String
 
-
     age Int Default 0
 }
 

@@ -3,7 +3,7 @@ import { IDriver } from "../drivers/idriver";
 declare let $engineDecl: IDriver;
 
 /*** @laborm-skip-to-here */
-export default class LabClient {
+export class LabClient {
   private engine: IDriver;
   /*** @lab-generate-listing-here */
 
