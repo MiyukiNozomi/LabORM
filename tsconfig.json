@@ -20,7 +20,7 @@
     // Other Outputs
     // we don't need any of these as LibORM does not install as a native library.
     "sourceMap": false,
-    "declaration": false,
+    "declaration": true,
     "declarationMap": false,
 
     // Stricter Typechecking Options

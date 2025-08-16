@@ -10,10 +10,10 @@ model Users {
 
     age Int Default 0
 }
-/*
+
 model Posts {
     id Int Primary AutoIncrement
 
     title String
     body String
-}*/
+}

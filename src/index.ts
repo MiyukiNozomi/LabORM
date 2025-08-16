@@ -52,6 +52,10 @@ async function performMigrate() {
     return (process.exitCode = -2);
   }
 
+  if ((await installAndGenerateClient(engine)) != 0) {
+    console.error("Generate failed.");
+    return (process.exitCode = -2);
+  }
   console.log("Successfully applied migrations!");
 }
 

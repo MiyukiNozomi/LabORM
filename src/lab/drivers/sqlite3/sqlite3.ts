@@ -1,10 +1,5 @@
 import Database from "better-sqlite3";
-import {
-  CompoundQueryOption,
-  DriverOptionsOrErrors,
-  IDriver,
-  QueryOption,
-} from "./../idriver";
+import { DriverOptionsOrErrors, IDriver } from "./../idriver";
 import { columnInfoAsSQLiteDeclaration, queryOptionsToWhereStmt } from "./conv";
 import { ColumnInfo, ModelInfo, SchemaFile } from "../../schema";
 import { Token } from "../../lexer";
@@ -37,7 +32,7 @@ Please install this module before using the LabORM generated client!
    **************************/
   public async find(
     tableName: string,
-    queryOptions: QueryOption | CompoundQueryOption | undefined
+    queryOptions: any | undefined
   ): Promise<Array<any>> {
     let valuesList = new Array<unknown>();
     const possibleQuery = queryOptionsToWhereStmt(queryOptions, valuesList);
@@ -57,7 +52,7 @@ Please install this module before using the LabORM generated client!
   public async update(
     tableName: string,
     values: Record<string, any>,
-    queryOptions: QueryOption | CompoundQueryOption | undefined
+    queryOptions: any | undefined
   ): Promise<Array<any>> {
     const valueKeys = Object.keys(values);
 

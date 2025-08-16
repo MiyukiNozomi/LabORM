@@ -1,28 +1,9 @@
+import { UntypedQuery } from "../generic/types";
 import { ColumnInfo, ModelInfo, SchemaFile } from "../schema";
 
 export type DriverOptionsOrErrors<T> = {
   errors: string[];
   driverOptions?: T;
-};
-
-export type QueryOperator =
-  | "EQUALS"
-  | "NOT_EQUALS"
-  | "GREATER"
-  | "LESS"
-  | "GREATER_EQUAL"
-  | "LESS_EQUAL";
-
-export type QueryOption = {
-  columnName: string;
-  op: QueryOperator;
-  value: unknown;
-};
-
-export type CompoundQueryOption = {
-  left: QueryOption | CompoundQueryOption;
-  op: "OR" | "AND";
-  right: QueryOption | CompoundQueryOption;
 };
 
 /**
@@ -37,14 +18,11 @@ export interface IDriver {
   printSetupMessage(): Promise<void>;
 
   /*** Data management */
-  find(
-    tableName: string,
-    queryOptions: QueryOption | CompoundQueryOption | undefined
-  ): Promise<Array<any>>;
+  find(tableName: string, queryOptions: any | undefined): Promise<Array<any>>;
   update(
     tableName: string,
     values: Record<string, any>,
-    queryOptions: QueryOption | CompoundQueryOption | undefined
+    queryOptions: any | undefined
   ): Promise<Array<any>>;
 
   insert(tableName: string, values: Record<string, any>): Promise<unknown>;

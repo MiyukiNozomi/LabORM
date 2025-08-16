@@ -2,11 +2,17 @@ import { IDriver } from "../drivers/idriver";
 
 declare let $engineDecl: IDriver;
 
+/*** @laborm-skip-to-here */
 export default class LabClient {
-  public engine: IDriver;
+  private engine: IDriver;
+  /*** @lab-generate-listing-here */
 
-  constructor() {
-    // supposedly this is of type IDriver.
+  public constructor() {
     this.engine = $engineDecl;
+    //@lab-generate-listing-here
+  }
+
+  public async close() {
+    await this.engine.close();
   }
 }

@@ -1,49 +1,38 @@
 import { ColumnInfo, ColumnType } from "../../schema";
-import { CompoundQueryOption, QueryOperator, QueryOption } from "../idriver";
+import { UntypedQuery } from "../../generic/types";
 
-function operationToSQLite(op: QueryOperator) {
-  switch (op) {
-    case "EQUALS":
-      return "=";
-    case "NOT_EQUALS":
-      return "!=";
-    case "LESS":
-      return "<";
-    case "GREATER":
-      return ">";
-    case "LESS_EQUAL":
-      return "<=";
-    case "GREATER_EQUAL":
-      return ">=";
-    default:
-      throw "Unimplemented QueryOperator: " + op;
-  }
-}
+// uhhh.. this feels kind of problematic? i mean this query format sucks but this is just beyond bad.
+// I'll reconsider trying to mimic prisma, this isn't worth it, it's more complicated to generate queries
+// for than I originally intended.
 
-function queryOptionsToCondition(
-  query: QueryOption | CompoundQueryOption,
-  valuesList: Array<unknown>
+// for now it will work but in the worst way possible, it's too limited and too much of a mess.
+// TODO: consider a more flexible way of doing queries
+function untypedQueryToStmt(
+  query: UntypedQuery,
+  valuesList: Array<unknown>,
+  defaultJoiner = "AND"
 ): string {
-  if ("left" in query) {
-    const queryOption = query as CompoundQueryOption;
-    return (
-      queryOptionsToCondition(queryOption.left, valuesList) +
-      ` ${queryOption.op} ` +
-      queryOptionsToCondition(queryOption.right, valuesList)
-    );
+  if (query.OR) {
+    return untypedQueryToStmt(query.AND, valuesList, "OR");
   } else {
-    const queryOption = query as QueryOption;
-    valuesList.push(queryOption.value);
-    return `${queryOption.columnName} ${operationToSQLite(queryOption.op)} ?`;
+    const keys = Object.keys(query);
+
+    let checks = new Array();
+    for (let key of keys) {
+      checks.push(`${key} = ?`);
+      valuesList.push((query as any)[key]);
+    }
+
+    return checks.join(` ${defaultJoiner} `);
   }
 }
 
 export function queryOptionsToWhereStmt(
-  query: QueryOption | CompoundQueryOption | undefined,
+  query: UntypedQuery | undefined,
   outValuesList: Array<unknown>
 ) {
   if (!query) return "";
-  return `WHERE ${queryOptionsToCondition(query, outValuesList)};`;
+  return `WHERE ${untypedQueryToStmt(query, outValuesList)};`;
 }
 
 export function columnTypeToSQLite3(type: ColumnType) {
