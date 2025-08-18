@@ -4,10 +4,7 @@
   "description": "",
   "main": "./dist/cli/index.js",
   "bin": "./dist/cli/index.js",
-  "scripts": {
-    "test-generate": "node . generate --dst-folder test/labORM --schema test/schema.laborm --verbose",
-    "test-migrate": "node . migrate --dst-folder test/labORM --schema test/schema.laborm --verbose"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
