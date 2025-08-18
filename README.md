@@ -61,7 +61,7 @@ import { LabClient } from "./labORM/laborm";
 - [x] Schema Parsing
 - [x] Diff detection
 - [x] Migration application
-- [x] Client Generation
+- [ ] Client Generation
 - [ ] A better query system
 - [ ] Insert or Update
 - [ ] UPDATE

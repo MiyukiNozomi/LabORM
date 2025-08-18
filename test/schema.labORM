@@ -1,0 +1,11 @@
+@engine sqlite3 {
+    file: "test.db"
+}
+
+model User {
+    id Int Primary AutoIncrement
+    name String
+    age Int Default 18
+
+    bornCity String Default 0
+}

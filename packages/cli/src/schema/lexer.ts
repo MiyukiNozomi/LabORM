@@ -1,24 +1,13 @@
-export type TokenType =
-  | "INVALID" // also applies for words starting with @
-  | "IDENTIFIER"
-  | "KEYWORD_MODEL"
-  | "KEYWORD_ENGINE"
-  | "STRING"
-  | "INT"
-  | "FLOAT"
-  | "LBRACE"
-  | "RBRACE"
-  | "DOUBLE_DOT"
-  | "EOF"; // used by the parser
+import type { Token, TokenType } from "../../../../shared/laborm-types/token";
+export type * from "../../../../shared/laborm-types/token";
 
-export type Token = {
-  type: TokenType;
-  line: number;
-  column: number;
-  data: string;
-
-  filename: string;
-};
+export function writeErrorImpl(token: Token, ...message: string[]) {
+  console.error(
+    `${token.filename}:${token.line}:${token.column}:error: ${message.join(
+      " "
+    )}`
+  );
+}
 
 export class SchemaLexer {
   private position: number;

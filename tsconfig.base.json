@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "esnext",
+        "module": "nodenext",   
+        "moduleResolution": "nodenext",
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        
+
+        "typeRoots": ["./node_modules/@types", "./shared"]
+    }
+}

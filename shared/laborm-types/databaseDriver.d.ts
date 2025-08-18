@@ -1,5 +1,4 @@
-import { UntypedQuery } from "../generic/types";
-import { ColumnInfo, ModelInfo, SchemaFile } from "../schema";
+import type { ColumnInfo, ModelInfo, SchemaFile } from "./schema";
 
 export type DriverOptionsOrErrors<T> = {
   errors: string[];
@@ -18,12 +17,6 @@ export interface IDriver {
   printSetupMessage(): Promise<void>;
 
   /*** Data management */
-  find(tableName: string, queryOptions: any | undefined): Promise<Array<any>>;
-  update(
-    tableName: string,
-    values: Record<string, any>,
-    queryOptions: any | undefined
-  ): Promise<Array<any>>;
 
   insert(tableName: string, values: Record<string, any>): Promise<unknown>;
 

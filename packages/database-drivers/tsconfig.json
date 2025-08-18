@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "../../dist/database-drivers",
+    "rootDir": "src"
+  },
+  "include": ["src", "../../shared/liborm-types"]
+}

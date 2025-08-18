@@ -1,18 +1,24 @@
 import Database from "better-sqlite3";
-import { DriverOptionsOrErrors, IDriver } from "./../idriver";
-import { columnInfoAsSQLiteDeclaration, queryOptionsToWhereStmt } from "./conv";
-import { ColumnInfo, ModelInfo, SchemaFile } from "../../schema";
-import { Token } from "../../lexer";
-import path from "path";
-import { RunOptions } from "../../..";
+import {
+  ColumnInfo,
+  ModelInfo,
+  SchemaFile,
+  IDriver,
+} from "../../../../shared/laborm-types";
+import { columnInfoAsSQLiteDeclaration } from "./conv";
 
-export type SQLite3DriverOptions = { file: string };
+/**
+ * Every driver should contain this function, no matter what.
+ */
+export default function init(options: { file: string }): SQLiteDriver {
+  return new SQLiteDriver(options.file);
+}
 
-export class SQLite3Driver implements IDriver {
+class SQLiteDriver implements IDriver {
   private db: Database.Database;
 
-  constructor(payload: SQLite3DriverOptions) {
-    this.db = new Database(payload.file);
+  constructor(file: string) {
+    this.db = new Database(file);
   }
 
   /**************************
@@ -30,54 +36,6 @@ Please install this module before using the LabORM generated client!
   /**************************
    *     Data Management    *
    **************************/
-  public async find(
-    tableName: string,
-    queryOptions: any | undefined
-  ): Promise<Array<any>> {
-    let valuesList = new Array<unknown>();
-    const possibleQuery = queryOptionsToWhereStmt(queryOptions, valuesList);
-
-    const preparedStmt = this.db.prepare(`
-    SELECT
-      *
-    FROM ${tableName}
-    ${possibleQuery}
-    `);
-
-    preparedStmt.bind(...valuesList);
-
-    return preparedStmt.all();
-  }
-
-  public async update(
-    tableName: string,
-    values: Record<string, any>,
-    queryOptions: any | undefined
-  ): Promise<Array<any>> {
-    const valueKeys = Object.keys(values);
-
-    let queryValuesList = new Array<unknown>();
-    const possibleQuery = queryOptionsToWhereStmt(
-      queryOptions,
-      queryValuesList
-    );
-
-    const preparedStmt = this.db.prepare(`
-    UPDATE ${tableName}
-    SET
-      ${valueKeys.map((v) => `${v} = ?`)}
-    ${possibleQuery}
-    `);
-
-    // I could do Object.values here too.. but i would rather do it this way to ensure they will have the same values as valueKeys.
-    for (let i = 0; i < valueKeys.length; i++) {
-      preparedStmt.bind(values[valueKeys[i]!]);
-    }
-
-    preparedStmt.bind(...queryValuesList);
-
-    return preparedStmt.all();
-  }
 
   public async insert(
     tableName: string,
@@ -187,28 +145,5 @@ WHERE type='table' AND name='labORMKeyValue'`
    **************************/
   public async close() {
     this.db.close();
-  }
-
-  public static validateOptions(
-    options: Record<string, Token>
-  ): DriverOptionsOrErrors<SQLite3DriverOptions> {
-    if (
-      typeof options["file"] !== "object" ||
-      options["file"].type != "STRING"
-    ) {
-      return {
-        errors: [
-          "SQLite3 options should only contain a string field named 'file'.",
-        ],
-      };
-    }
-    return {
-      errors: [],
-      driverOptions: {
-        file: path.resolve(
-          path.join(RunOptions.OUTPUT_DIR, options["file"].data)
-        ),
-      },
-    };
   }
 }

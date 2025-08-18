@@ -1,12 +1,10 @@
-import { SchemaLexer, Token, TokenType } from "./lexer";
+import { SchemaLexer, Token, TokenType, writeErrorImpl } from "./lexer";
 import {
-  SUPPORTED_DRIVERS,
   ColumnInfo,
   ColumnType,
   ModelInfo,
   SchemaFile,
-} from "./schema";
-import { writeErrorImpl } from "./tools";
+} from "../../../../shared/laborm-types";
 
 /**
  * Parses schema files.
@@ -128,11 +126,7 @@ export class SchemaParser {
 
   public parseEngine() {
     this.schemaFile.engineOptions = {
-      name: this.match(
-        "IDENTIFIER",
-        "Need a valid engine name here! supported engines: " +
-          JSON.stringify(SUPPORTED_DRIVERS)
-      ),
+      name: this.match("IDENTIFIER", "Need a valid engine name here!"),
       options: {},
     };
 
