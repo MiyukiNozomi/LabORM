@@ -36,7 +36,10 @@ const ArgTypes = z.object({
   "schema-file": z.string().default("schema.labORM"),
   folder: z.string().default("./database"),
 
+  "no-action": z.boolean().default(false),
   verbose: z.boolean().default(false),
+
+  "output-json-schema-file": z.string().optional(),
 });
 
 export type RunOptions = z.infer<typeof ArgTypes>;
@@ -68,4 +71,9 @@ async function runCLI() {
 
   await handler(RunFlags);
 }
-runCLI();
+
+runCLI().catch((err) => {
+  console.log("Sorry! LabORM's CLI has crashed!");
+  console.log("Message: ", err instanceof Error ? err.message : err);
+  console.error("Error stack:", err instanceof Error ? err.stack : err);
+});

@@ -104,11 +104,31 @@ export class SchemaLexer {
           data: cc,
           type: cc == "{" ? "LBRACE" : "RBRACE",
         });
+      } else if (this.current() == "[" || this.current() == "]") {
+        let cc = this.next();
+        tokens.push({
+          ...baseTokenData,
+          data: cc,
+          type: cc == "[" ? "LSQUARE" : "RSQUARE",
+        });
+      } else if (this.current() == "(" || this.current() == ")") {
+        let cc = this.next();
+        tokens.push({
+          ...baseTokenData,
+          data: cc,
+          type: cc == "(" ? "LPAREN" : "RPAREN",
+        });
       } else if (this.current() == ":") {
         tokens.push({
           ...baseTokenData,
           data: this.next(),
           type: "DOUBLE_DOT",
+        });
+      } else if (this.current() == ",") {
+        tokens.push({
+          ...baseTokenData,
+          data: this.next(),
+          type: "COMMA",
         });
       } else {
         tokens.push({
@@ -126,6 +146,8 @@ export class SchemaLexer {
     switch (cc.toLowerCase()) {
       case "@engine":
         return "KEYWORD_ENGINE";
+      case "@relation":
+        return "KEYWORD_RELATION";
       case "model":
         return "KEYWORD_MODEL";
       default:

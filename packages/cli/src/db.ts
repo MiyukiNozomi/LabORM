@@ -12,7 +12,7 @@ export async function loadDatabaseDriver(
   schema: SchemaFile
 ): Promise<NativeDatabase> {
   if (!schema.engineOptions)
-    throw "EngineOptions is undefined here, this is illegal.";
+    throw new Error("EngineOptions is undefined here, this is illegal.");
 
   mkdirSync(runOptions.folder, {
     recursive: true,

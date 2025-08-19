@@ -24,13 +24,13 @@ export interface IDriver {
   loadSchema(): Promise<SchemaFile | null>;
   storeSchema(thisSchema: SchemaFile): Promise<void>;
 
-  createTable(table: ModelInfo): Promise<void>;
-  addColumn(col: ColumnInfo): Promise<void>;
-  updateColumn(col: ColumnInfo): Promise<void>;
+  createTable(thisSchema: SchemaFile, table: ModelInfo): Promise<void>;
+  addColumn(thisSchema: SchemaFile, col: ColumnInfo): Promise<void>;
+  updateColumn(thisSchema: SchemaFile, col: ColumnInfo): Promise<void>;
 
-  dropColumn(col: ColumnInfo): Promise<void>;
+  dropColumn(thisSchema: SchemaFile, col: ColumnInfo): Promise<void>;
 
-  dropTable(tableName: string): Promise<void>;
+  dropTable(thisSchema: SchemaFile, table: ModelInfo): Promise<void>;
 
   /*** Other */
   close(): Promise<void>;

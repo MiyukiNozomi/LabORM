@@ -1,16 +1,25 @@
 export type TokenType =
   | "INVALID" // also applies for words starting with @
+  /** KEYWORDS */
   | "IDENTIFIER"
   | "KEYWORD_MODEL"
   | "KEYWORD_ENGINE"
+  | "KEYWORD_RELATION"
+  /** LITERALS */
   | "STRING"
   | "INT"
   | "FLOAT"
+  /** SYMBOLS */
   | "LBRACE"
   | "RBRACE"
+  | "LPAREN"
+  | "RPAREN"
+  | "LSQUARE"
+  | "RSQUARE"
+  | "COMMA"
   | "DOUBLE_DOT"
-  | "EOF"; // used by the parser
-
+  /** just a file indicator */
+  | "EOF";
 export type Token = {
   type: TokenType;
   line: number;

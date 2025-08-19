@@ -3,7 +3,7 @@ import type { IDriver } from "./databaseDriver";
 
 /** This file wont be built, please do not include actual implementations here */
 
-export type ColumnType = "STRING" | "INT" | "FLOAT";
+export type ColumnType = "STRING" | "INT" | "FLOAT" | "RELATION";
 
 export type ColumnInfo = {
   name: Token;
@@ -15,7 +15,25 @@ export type ColumnInfo = {
 
   defaultValue?: Token;
 
-  ownerModelName: Token;
+  /***
+   * This field refers to non-runtime information on the column.
+   * This is only used by the CLI and the generated client themselves.
+   */
+  interstrict: {
+    ownerModelName: Token;
+    columnTypeToken: Token;
+    relationshipStatus?:
+      | {
+          type: "Array";
+          modelName: string;
+        }
+      | {
+          type: "Field";
+          modelName: string;
+          thisFieldName: Token;
+          otherFieldName: Token;
+        };
+  };
 };
 
 export type ModelInfo = {

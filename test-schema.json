@@ -1,0 +1,341 @@
+{
+  "models": [
+    {
+      "name": {
+        "filename": "test/schema.labORM",
+        "column": 6,
+        "line": 5,
+        "data": "User",
+        "type": "IDENTIFIER"
+      },
+      "columns": [
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 6,
+            "data": "id",
+            "type": "IDENTIFIER"
+          },
+          "type": "INT",
+          "nullable": false,
+          "primaryKey": true,
+          "autoIncrement": true,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 5,
+              "data": "User",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 7,
+              "line": 6,
+              "data": "Int",
+              "type": "IDENTIFIER"
+            }
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 7,
+            "data": "name",
+            "type": "IDENTIFIER"
+          },
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 5,
+              "data": "User",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 9,
+              "line": 7,
+              "data": "String",
+              "type": "IDENTIFIER"
+            }
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 8,
+            "data": "age",
+            "type": "IDENTIFIER"
+          },
+          "type": "INT",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 5,
+              "data": "User",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 8,
+              "line": 8,
+              "data": "Int",
+              "type": "IDENTIFIER"
+            }
+          },
+          "defaultValue": {
+            "filename": "test/schema.labORM",
+            "column": 20,
+            "line": 8,
+            "data": "18",
+            "type": "INT"
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 10,
+            "data": "bornCity",
+            "type": "IDENTIFIER"
+          },
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 5,
+              "data": "User",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 13,
+              "line": 10,
+              "data": "String",
+              "type": "IDENTIFIER"
+            }
+          },
+          "defaultValue": {
+            "filename": "test/schema.labORM",
+            "column": 28,
+            "line": 10,
+            "data": "0",
+            "type": "INT"
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 12,
+            "data": "posts",
+            "type": "IDENTIFIER"
+          },
+          "type": "RELATION",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 5,
+              "data": "User",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 10,
+              "line": 12,
+              "data": "Posts",
+              "type": "IDENTIFIER"
+            },
+            "relationshipStatus": {
+              "type": "Array",
+              "modelName": "Posts"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": {
+        "filename": "test/schema.labORM",
+        "column": 6,
+        "line": 15,
+        "data": "Posts",
+        "type": "IDENTIFIER"
+      },
+      "columns": [
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 16,
+            "data": "id",
+            "type": "IDENTIFIER"
+          },
+          "type": "INT",
+          "nullable": false,
+          "primaryKey": true,
+          "autoIncrement": true,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 15,
+              "data": "Posts",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 7,
+              "line": 16,
+              "data": "Int",
+              "type": "IDENTIFIER"
+            }
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 18,
+            "data": "title",
+            "type": "IDENTIFIER"
+          },
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 15,
+              "data": "Posts",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 10,
+              "line": 18,
+              "data": "String",
+              "type": "IDENTIFIER"
+            }
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 19,
+            "data": "description",
+            "type": "IDENTIFIER"
+          },
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 15,
+              "data": "Posts",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 16,
+              "line": 19,
+              "data": "String",
+              "type": "IDENTIFIER"
+            }
+          }
+        },
+        {
+          "name": {
+            "filename": "test/schema.labORM",
+            "column": 4,
+            "line": 21,
+            "data": "author",
+            "type": "IDENTIFIER"
+          },
+          "type": "RELATION",
+          "nullable": false,
+          "primaryKey": false,
+          "autoIncrement": false,
+          "interstrict": {
+            "ownerModelName": {
+              "filename": "test/schema.labORM",
+              "column": 6,
+              "line": 15,
+              "data": "Posts",
+              "type": "IDENTIFIER"
+            },
+            "columnTypeToken": {
+              "filename": "test/schema.labORM",
+              "column": 11,
+              "line": 21,
+              "data": "User",
+              "type": "IDENTIFIER"
+            },
+            "relationshipStatus": {
+              "type": "Field",
+              "modelName": "User",
+              "otherFieldName": {
+                "filename": "test/schema.labORM",
+                "column": 36,
+                "line": 21,
+                "data": "id",
+                "type": "IDENTIFIER"
+              },
+              "thisFieldName": {
+                "filename": "test/schema.labORM",
+                "column": 26,
+                "line": 21,
+                "data": "authorId",
+                "type": "IDENTIFIER"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "engineOptions": {
+    "name": {
+      "filename": "test/schema.labORM",
+      "column": 8,
+      "line": 1,
+      "data": "sqlite3",
+      "type": "IDENTIFIER"
+    },
+    "options": {
+      "file": {
+        "filename": "test/schema.labORM",
+        "column": 10,
+        "line": 2,
+        "data": "test.db",
+        "type": "STRING"
+      }
+    }
+  }
+}

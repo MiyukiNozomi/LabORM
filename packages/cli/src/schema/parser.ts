@@ -58,15 +58,61 @@ export class SchemaParser {
 
     this.match("LBRACE", "Missing opening brace.");
     while (this.current().type != "RBRACE" && this.notEOF()) {
+      const columnName = this.match(
+        "IDENTIFIER",
+        "Expected a valid column name!"
+      );
+      const columnTypeToken = this.match(
+        "IDENTIFIER",
+        "Expected a valid column type here!"
+      );
+      const columnType = this.detectColumnType(columnTypeToken);
+
       let column: ColumnInfo = {
-        name: this.match("IDENTIFIER", "Expected a valid column name!"),
-        type: this.parseColumnType(),
+        name: columnName,
+        type: columnType,
         nullable: false,
         primaryKey: false,
         autoIncrement: false,
 
-        ownerModelName: model.name,
+        interstrict: {
+          ownerModelName: model.name,
+          columnTypeToken: columnTypeToken,
+        },
       };
+
+      if (this.consume("LSQUARE")) {
+        this.match("RSQUARE", "Mismatched square braces!");
+
+        column.interstrict.relationshipStatus = {
+          type: "Array",
+          modelName: columnTypeToken.data,
+        };
+      } else if (this.consume("KEYWORD_RELATION")) {
+        this.match(
+          "LPAREN",
+          "Incorrect @relation syntax! expected: @relation(localFieldNameToCreate, otherFieldName)"
+        );
+
+        const thisField = this.match(
+          "IDENTIFIER",
+          "Expected a valid local field name!"
+        );
+        this.match("COMMA", "Missing a ',' between field names.");
+        const otherField = this.match(
+          "IDENTIFIER",
+          "Expected a valid local field name!"
+        );
+
+        this.match("RPAREN", "Mistmached @relation parenthesis.");
+
+        column.interstrict.relationshipStatus = {
+          type: "Field",
+          modelName: columnTypeToken.data,
+          otherFieldName: otherField,
+          thisFieldName: thisField,
+        };
+      }
 
       let line = column.name.line;
 
@@ -106,21 +152,14 @@ export class SchemaParser {
     this.schemaFile.models.push(model);
   }
 
-  public parseColumnType(): ColumnType {
-    const tk = this.match("IDENTIFIER", "Expected a valid column type here!");
-
+  public detectColumnType(tk: Token): ColumnType {
     switch (tk.data.toLowerCase()) {
       case "string":
       case "int":
       case "float":
         return tk.data.toUpperCase() as ColumnType;
       default:
-        this.writeError(
-          tk,
-          "Unknown or unimplemented column type",
-          tk.filename
-        );
-        return "STRING";
+        return "RELATION"; // treat it as a relation right now.
     }
   }
 

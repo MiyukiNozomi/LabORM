@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { RunOptions } from "..";
 import { SchemaParser } from "./parser";
+import { validateRelations } from "./validation/relations";
 
 export function getSchema(runOptions: RunOptions) {
   const filename = runOptions["schema-file"];
@@ -14,15 +15,29 @@ export function getSchema(runOptions: RunOptions) {
   const parser = new SchemaParser(filename, readFileSync(filename).toString());
   const schemaFile = parser.parse();
 
-  if (parser.hadError) {
+  if (runOptions["output-json-schema-file"]) {
+    const outFile = runOptions["output-json-schema-file"];
+    console.log(
+      "heeeyy~  you used the --output-json-schema-file argument! storing your schema (as JSON) to " +
+        outFile
+    );
+    writeFileSync(outFile, JSON.stringify(schemaFile, null, 4));
+  }
+
+  if (parser.hadError || !schemaFile) {
     console.error(filename + " has failed to load.");
-    process.exit(-1);
+    return process.exit(-1);
   }
 
-  if (!schemaFile!.engineOptions) {
+  if (!schemaFile.engineOptions) {
     console.error(filename + " is lacking engine options, cannot proceed.");
-    process.exit(-1);
+    return process.exit(-1);
   }
 
-  return schemaFile!;
+  if (!validateRelations(schemaFile)) {
+    console.error(filename + " has relational errors, cannot proceed.");
+    return process.exit(-1);
+  }
+
+  return schemaFile;
 }

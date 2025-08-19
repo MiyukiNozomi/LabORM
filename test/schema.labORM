@@ -6,6 +6,15 @@ model User {
     id Int Primary AutoIncrement
     name String
     age Int Default 18
+    
+    posts Posts[]
+}
 
-    bornCity String Default 0
+model Posts {
+    id Int Primary AutoIncrement
+
+    title String
+    description String
+
+    author User @relation(authorId, id)
 }

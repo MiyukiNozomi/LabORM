@@ -10,6 +10,48 @@ export type FoundModelDifferences = {
   columnsToBeUpdated: ColumnInfo[];
 };
 
+export function ensureRelationStatusDidNotChange(
+  thisColumn: ColumnInfo,
+  existingColumn: ColumnInfo
+) {
+  const current = thisColumn.interstrict.relationshipStatus;
+  const previous = existingColumn.interstrict.relationshipStatus;
+
+  if (!current && !previous) return;
+  if (
+    (previous != undefined && current == undefined) ||
+    (current != undefined && previous == undefined)
+  ) {
+    throw (
+      "Please do not try to turn a non-relation into a relation!" +
+      "this isn't supported, please remove your old field and add a new one if you want a new relation field!\n" +
+      `Illegal relation change in: ${thisColumn.interstrict.ownerModelName.data}#${thisColumn.name.data}`
+    );
+  }
+  if (!previous || !current) return;
+
+  const keys = Object.keys(current);
+
+  for (const key of keys) {
+    let a = (current as any)[key];
+    let b = (previous as any)[key];
+
+    // the field could be a token.
+    if (typeof a == "object" && "data" in a) {
+      a = a.data;
+      b = b.data;
+    } else if (typeof a == "object") continue;
+
+    if (a !== b) {
+      throw new Error(
+        `Relationship status for column "${thisColumn.name.data}" changed at key "${key}": "${b}" → "${a}".
+        This is illegal! please remove your old field and add a new one to change properties of foreign keys.
+It makes NO sense to even do this operation in the first place!`
+      );
+    }
+  }
+}
+
 export function findDifferencesInModels(
   runOptions: RunOptions,
   thisModel: ModelInfo,
@@ -51,6 +93,8 @@ export function findDifferencesInModels(
         return a !== b;
       });
 
+      ensureRelationStatusDidNotChange(thisColumn, existingColumn);
+
       if (columnChanged) {
         columnsToBeUpdated.push(thisColumn);
       }
@@ -78,13 +122,16 @@ export function findDifferencesInModels(
 
   // just in case, we do an extra validation step here:
   for (let newCol of columnsToBeAdded) {
-    if (!newCol.defaultValue) {
+    if (
+      !newCol.defaultValue &&
+      newCol.interstrict.relationshipStatus === undefined
+    ) {
       writeErrorImpl(
         newCol.name,
         "Column '" +
           newCol.name.data +
           "' is a new column in model '" +
-          newCol.ownerModelName.data +
+          newCol.interstrict.ownerModelName.data +
           "' and needs a default value."
       );
       return null;

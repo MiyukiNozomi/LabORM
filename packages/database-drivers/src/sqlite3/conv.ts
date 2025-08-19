@@ -1,4 +1,9 @@
-import { ColumnInfo, ColumnType } from "../../../../shared/laborm-types";
+import {
+  ColumnInfo,
+  ColumnType,
+  ModelInfo,
+  Token,
+} from "../../../../shared/laborm-types";
 
 export function columnTypeToSQLite3(type: ColumnType) {
   switch (type) {
@@ -9,8 +14,16 @@ export function columnTypeToSQLite3(type: ColumnType) {
     case "STRING":
       return "TEXT";
     default:
-      throw "Type " + type + " not implemented in SQLite3 driver!";
+      throw new Error("Type " + type + " not implemented in SQLite3 driver!");
   }
+}
+
+export function nameRelation(
+  column: ColumnInfo,
+  thisFieldName: Token,
+  referencedModel: ModelInfo
+) {
+  return `Lab${column.interstrict.ownerModelName.data}F${thisFieldName.data}To${referencedModel.name.data}Relation`;
 }
 
 export function columnInfoAsSQLiteDeclaration(column: ColumnInfo) {

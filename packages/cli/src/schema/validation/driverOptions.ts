@@ -8,7 +8,7 @@ export function validateDriverOptionsOrExplode(
   { engineOptions }: SchemaFile
 ) {
   if (!engineOptions)
-    throw "Bad schema file? somehow engineOptions == undefined.";
+    throw new Error("Bad schema file? somehow engineOptions == undefined.");
 
   switch (engineOptions.name.data) {
     case "sqlite3": {
