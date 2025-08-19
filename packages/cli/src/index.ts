@@ -32,7 +32,7 @@ function parseArgs(argv: string[]) {
   return { command, rawFlags };
 }
 
-const ArgTypes = z.object({
+export const ArgTypes = z.object({
   "schema-file": z.string().default("schema.labORM"),
   folder: z.string().default("./database"),
 
