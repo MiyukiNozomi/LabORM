@@ -28,31 +28,11 @@ model Posts {
 }
 ```
 
-And with a simple command.. `laborm migrate` You will have a database and client ready to use!
+And with a simple command.. `laborm migrate` You will have a database ready to use!
 
-## Using the generated client:
+## Using the generated client
 
-```typescript
-import { LabClient } from "./labORM/laborm";
-
-(async () => {
-  const laborm = new LabClient();
-
-  await laborm.users.insert({
-    age: 18,
-    name: "Miyuki",
-  });
-
-  console.log(
-    await laborm.users.insert({
-      age: 20,
-      name: "Nozomi",
-    })
-  );
-
-  await laborm.close();
-})();
-```
+TODO! really! still re-coding this after the refactor i made!
 
 ## TODO
 
@@ -66,7 +46,7 @@ import { LabClient } from "./labORM/laborm";
 - [ ] Insert or Update
 - [ ] UPDATE
 - [ ] DELETE
-- [ ] Foreign Keys
+- [x] Foreign Keys
 - [ ] @import statements in schemas for multiple schema files
 - [ ] Allow inspection of existing databases to generate a schema from
 
