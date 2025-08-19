@@ -36,7 +36,7 @@ TODO! really! still re-coding this after the refactor i made!
 
 ## TODO
 
-- [ ] Improve the entire code
+- [x] Improve the entire code
 - [ ] Documentation
 - [x] Schema Parsing
 - [x] Diff detection
