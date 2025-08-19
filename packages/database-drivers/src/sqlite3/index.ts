@@ -197,7 +197,7 @@ WHERE type='table' AND name='labORMKeyValue'`
       col.interstrict.relationshipStatus.thisFieldName,
       referencedModel
     );
-    this.db.exec(`DROP TABLE ${tableName}`);
+    this.db.exec(`DROP TABLE IF EXISTS ${tableName}`);
   }
 
   private createRelationIfNeeded(thisSchema: SchemaFile, column: ColumnInfo) {
