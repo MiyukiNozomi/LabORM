@@ -1,5 +1,5 @@
 import { Token } from "./token";
-import type { IDriver } from "./databaseDriver";
+import type { IDriver } from "./driver-base/databaseDriver";
 
 /** This file wont be built, please do not include actual implementations here */
 

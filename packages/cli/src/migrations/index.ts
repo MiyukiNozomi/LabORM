@@ -6,15 +6,17 @@ export async function applyMigrations(
   runOptions: RunOptions,
   db: NativeDatabase
 ) {
-  const physicalSchema = await db.driver.loadSchema();
+  const schemaDriver = db.driver.schemaDriver();
+
+  const physicalSchema = await schemaDriver.loadSchema();
 
   if (!physicalSchema) {
     console.log("First time migration spotted!");
 
     for (let model of db.schema.models)
-      await db.driver.createTable(db.schema, model);
+      await schemaDriver.createTable(db.schema, model);
 
-    await db.driver.storeSchema(db.schema);
+    await schemaDriver.storeSchema(db.schema);
     return;
   }
 
@@ -45,23 +47,23 @@ export async function applyMigrations(
   // applying model-specific differences now...
   for (let modelDifferences of diffs.modelDifferencesList) {
     for (let columnToAdd of modelDifferences.columnsToBeAdded)
-      await db.driver.addColumn(db.schema, columnToAdd);
+      await schemaDriver.addColumn(db.schema, columnToAdd);
 
     for (let columnToRemoved of modelDifferences.columnsToBeRemoved)
-      await db.driver.dropColumn(db.schema, columnToRemoved);
+      await schemaDriver.dropColumn(db.schema, columnToRemoved);
 
     for (let columnToUpdate of modelDifferences.columnsToBeUpdated)
-      await db.driver.updateColumn(db.schema, columnToUpdate);
+      await schemaDriver.updateColumn(db.schema, columnToUpdate);
   }
 
   for (let modelToDrop of diffs.modelsToDrop) {
-    await db.driver.dropTable(db.schema, modelToDrop);
+    await schemaDriver.dropTable(db.schema, modelToDrop);
   }
 
   for (let modelToAdd of diffs.modelsToAdd) {
-    await db.driver.createTable(db.schema, modelToAdd);
+    await schemaDriver.createTable(db.schema, modelToAdd);
   }
 
-  await db.driver.storeSchema(db.schema);
+  await schemaDriver.storeSchema(db.schema);
   console.log("Migrations applied successfully!");
 }

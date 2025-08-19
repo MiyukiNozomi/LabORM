@@ -1,4 +1,4 @@
-import type { ColumnInfo, ModelInfo, SchemaFile } from "./schema";
+import { ISchemaDriver } from "./schemaDriver";
 
 export type DriverOptionsOrErrors<T> = {
   errors: string[];
@@ -21,16 +21,7 @@ export interface IDriver {
   insert(tableName: string, values: Record<string, any>): Promise<unknown>;
 
   /*** Schema Management */
-  loadSchema(): Promise<SchemaFile | null>;
-  storeSchema(thisSchema: SchemaFile): Promise<void>;
-
-  createTable(thisSchema: SchemaFile, table: ModelInfo): Promise<void>;
-  addColumn(thisSchema: SchemaFile, col: ColumnInfo): Promise<void>;
-  updateColumn(thisSchema: SchemaFile, col: ColumnInfo): Promise<void>;
-
-  dropColumn(thisSchema: SchemaFile, col: ColumnInfo): Promise<void>;
-
-  dropTable(thisSchema: SchemaFile, table: ModelInfo): Promise<void>;
+  schemaDriver(): ISchemaDriver;
 
   /*** Other */
   close(): Promise<void>;
