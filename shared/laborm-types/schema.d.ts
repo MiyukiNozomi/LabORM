@@ -1,5 +1,6 @@
 import { Token } from "./token";
 import type { IDriver } from "./driver-base/databaseDriver";
+import { JSPrimitiveType } from "./schemaRtti";
 
 /** This file wont be built, please do not include actual implementations here */
 

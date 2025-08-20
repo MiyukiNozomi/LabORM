@@ -125,6 +125,10 @@ export class SQLite3SchemaDriver implements ISchemaDriver {
         `);
   }
 
+  /*************
+   * Utilities *
+   *************/
+
   private dropRelationTableIfNeeded(thisSchema: SchemaFile, col: ColumnInfo) {
     if (
       !col.interstrict.relationshipStatus ||
