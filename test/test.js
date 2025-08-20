@@ -2,8 +2,6 @@ const { default: LabClient } = require("./client");
 
 const db = new LabClient();
 
-console.log(db);
-
 async function test() {
   const miyuki = await db.user.insert({
     name: "Miyuki",
@@ -30,4 +28,4 @@ async function test() {
   });
 }
 
-//test().catch((v) => console.log(v));
+test().catch((v) => console.log(v));

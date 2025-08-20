@@ -15,22 +15,24 @@ export class ModelTypeGenerator {
   private kind?: GeneratorType;
   public calculatedFields: Record<string, RuntimeTypeInfoObject>;
 
-  private runtimeTypings: boolean;
+  private runtimeTypeMode: boolean;
   private noRefGenerator?: ModelTypeGenerator;
 
   public constructor(schema: SchemaFile, kind?: GeneratorType) {
     this.kind = kind;
     this.schema = schema;
-    this.runtimeTypings = false;
+    this.runtimeTypeMode = false;
     this.calculatedFields = {};
 
-    this.schema.models.forEach((v) => this.generatePrepareFieldsOf(v));
+    this.schema.models.forEach(
+      (v) =>
+        (this.calculatedFields[v.name.data] = this.generatePrepareFieldsOf(v))
+    );
   }
 
-  public runtimeTypeMode(noRefGenerator?: ModelTypeGenerator) {
-    this.runtimeTypings = true;
+  public asRuntimeTypesMode(noRefGenerator?: ModelTypeGenerator) {
+    this.runtimeTypeMode = true;
     this.noRefGenerator = noRefGenerator;
-    if (this.noRefGenerator) this.noRefGenerator.runtimeTypeMode();
     return this;
   }
 
@@ -38,7 +40,7 @@ export class ModelTypeGenerator {
   private generatePrepareFieldsOf(model: ModelInfo, allowRefs: boolean = true) {
     if (this.kind == "NoRef") allowRefs = false;
 
-    this.calculatedFields[model.name.data] = {};
+    let obj: RuntimeTypeInfoObject = {};
 
     for (let column of model.columns) {
       let isNullable = column.nullable;
@@ -48,10 +50,8 @@ export class ModelTypeGenerator {
 
       let eitherObjects: RuntimeTypeInfoObject[] | undefined;
 
-      if (this.kind != undefined) {
-        isNullable =
-          isNullable || column.defaultValue !== undefined || column.primaryKey;
-      }
+      isNullable =
+        isNullable || column.defaultValue !== undefined || column.autoIncrement;
 
       if (column.interstrict.relationshipStatus) {
         if (!allowRefs) continue;
@@ -63,7 +63,7 @@ export class ModelTypeGenerator {
         eitherObjects = relObject.eitherObjects;
       }
 
-      this.calculatedFields[model.name.data][column.name.data] = {
+      obj[column.name.data] = {
         name: column.name.data,
         tsTypeName: tsType ?? primitiveType,
         expectedPrimitiveType: primitiveType,
@@ -74,7 +74,7 @@ export class ModelTypeGenerator {
       };
     }
 
-    return this.calculatedFields[model.name.data]!;
+    return obj as RuntimeTypeInfoObject;
   }
 
   private objectTypeFromRelation(column: ColumnInfo) {
@@ -92,13 +92,20 @@ export class ModelTypeGenerator {
           "! (or it's missing a primary key)"
       );
 
+    if (this.kind == undefined) {
+      return {
+        tsTypename: referencedModel?.name.data,
+        eitherObjects: undefined,
+      };
+    }
+
     return {
       tsTypename: referencedModel.name.data + (this.kind ?? ""),
       eitherObjects: [
         {
           create: {
             name: "create",
-            tsTypeName: column.name.data,
+            tsTypeName: referencedModel.name.data,
             expectedPrimitiveType: "object",
             eitherObjects: [
               this.generatePrepareFieldsOf(referencedModel, false),
@@ -117,7 +124,7 @@ export class ModelTypeGenerator {
         {
           connect: (<RuntimeTypeInfo>{
             name: "connect",
-            tsTypeName: `Array<${this.columnJSType(primaryKey)}>`,
+            tsTypeName: this.columnJSType(primaryKey),
             expectedPrimitiveType: this.columnJSType(primaryKey),
             isArray: true,
             isNullable: false,
@@ -190,16 +197,14 @@ ${"".padStart(Math.max(0, indent - 1), "\t")}}`;
     modelName: string,
     mapping: RuntimeTypeInfoObject
   ) {
+    if (this.runtimeTypeMode) return JSON.stringify(mapping);
+
     return `export type ${modelName}${this.kind ?? ""} = ${this.stringifyObject(
       mapping
     )}`;
   }
 
   public generate(list?: string[]) {
-    if (this.runtimeTypings)
-      throw new Error(
-        "It appears you tried to generate normal typings while runtimeTypings was set to true. Please check your commits."
-      );
     if (!list) list = new Array<string>();
     this.schema.models.forEach((v) => {
       const mapping = this.calculatedFields[v.name.data];
@@ -208,7 +213,14 @@ ${"".padStart(Math.max(0, indent - 1), "\t")}}`;
     return list;
   }
 
-  public generateRuntime() {
-    return this.mappingToDeclaration;
+  public generateJSON(json: Record<string, string>) {
+    this.schema.models.forEach((v) => {
+      const mapping = this.calculatedFields[v.name.data];
+      json[`${v.name.data}${this.kind ?? ""}`] = this.mappingToDeclaration(
+        v.name.data,
+        mapping
+      );
+    });
+    return json;
   }
 }

@@ -8,10 +8,10 @@ import {
   writeFileSync,
 } from "fs";
 import { RunOptions } from "..";
-import { JSPrimitiveType, SchemaFile } from "../../../../shared/laborm-types";
+import { SchemaFile } from "../../../../shared/laborm-types";
 import path from "path";
 import { genTypings } from "./typings";
-import { GeneratorType, GeneratorTypes, ModelTypeGenerator } from "./modelType";
+import { RuntimeTypeGenerator } from "./runtimeTypes";
 
 export async function generateClient(
   runOptions: RunOptions,
@@ -39,6 +39,10 @@ export async function generateClient(
     driverFolder,
     {}
   );
+  writeFileSync(
+    path.join(clientFolder, "schemaTypes.js"),
+    new RuntimeTypeGenerator(schema).toJSON()
+  );
   console.log("Driver Installed!");
 
   copyWithReplacements(
@@ -46,7 +50,6 @@ export async function generateClient(
     path.resolve(__dirname, `../../client/`),
     clientFolder,
     {
-      SchemaLoaded: "[]",
       DatabaseOptions: JSON.stringify(schema.engineOptions),
     }
   );
@@ -56,21 +59,6 @@ export async function generateClient(
   await genTypings(clientFolder, schema);
 
   console.log("Client successful generated!");
-}
-
-function generateRuntimeTypes(schema: SchemaFile) {
-  let typings: Record<string, any> = {};
-
-  const noRefGenerator = new ModelTypeGenerator(
-    schema,
-    "NoRef"
-  ).runtimeTypeMode();
-
-  for (let genType of GeneratorTypes.filter((v) => v != "NoRef")) {
-    const generator = new ModelTypeGenerator(schema, genType).runtimeTypeMode();
-  }
-
-  return typings as Record<GeneratorType, Record<string, JSPrimitiveType>>;
 }
 
 function copyWithReplacements(
